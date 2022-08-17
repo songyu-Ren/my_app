@@ -10,6 +10,7 @@
     "@ui5/webcomponents-fiori": "~1.6.0",
     "@ui5/webcomponents-icons": "~1.6.0",
     "@ui5/webcomponents-react": "^0.27.3",
+    "@ui5/webcomponents-react-charts": "^0.27.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
