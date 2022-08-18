@@ -1,9 +1,31 @@
 import React, { useState } from "react";
-import { Card, CardHeader, Text, Icon } from "@ui5/webcomponents-react";
+import {
+  Avatar,
+  Card,
+  CardHeader,
+  Text,
+  ShellBar,
+  ShellBarItem,
+  List,
+  StandardListItem,
+  ValueState,
+  ProgressIndicator,
+  Title,
+  TitleLevel,
+  FlexBox,
+  FlexBoxJustifyContent,
+  FlexBoxWrap,
+  FlexBoxDirection,
+  AnalyticalTable,
+  Icon
+} from "@ui5/webcomponents-react";
 import { spacing } from "@ui5/webcomponents-react-base";
 import { BarChart, LineChart } from "@ui5/webcomponents-react-charts";
 import "@ui5/webcomponents-icons/dist/line-chart.js";
 import "@ui5/webcomponents-icons/dist/horizontal-bar-chart.js";
+import "@ui5/webcomponents-icons/dist/add.js";
+import "@ui5/webcomponents-icons/dist/list.js";
+import "@ui5/webcomponents-icons/dist/table-view.js";
 
 const dataset = [
   {
@@ -36,45 +58,174 @@ const dataset = [
   }
 ];
 
+const tableData = new Array(500).fill(null).map((_, index) => {
+  return {
+    name: `name${index}`,
+    age: Math.ceil(Math.random()*2),
+    friend: {
+      name: `friend.Name${index}`,
+      age: Math.ceil(Math.random()*2)
+    }
+  };
+});
+
+const tableColumns = [
+  {
+    Header: "Name",
+    accessor: "name" // String-based value accessors!
+  },
+  {
+    Header: "Age",
+    accessor: "age"
+  },
+  {
+    Header: "Friend Name",
+    accessor: "friend.name"
+  },
+  {
+    Header: "Friend Age",
+    accessor: "friend.age"
+  }
+];
+
 export function MyApp() {
   const [toggleCharts, setToggleCharts] = useState("lineChart");
+  const [loading, setLoading] = useState(false);
+  const contentTitle =
+    toggleCharts === "lineChart" ? "Line Chart" : "Bar Chart";
+  const switchToChart =
+    toggleCharts === "lineChart" ? "Bar Chart" : "Line Chart";
   const handleHeaderClick = () => {
     if (toggleCharts === "lineChart") {
-      setToggleCharts("barChart");
+      setLoading(true);
+      setTimeout(() => {
+        setLoading(false);
+        setToggleCharts("barChart");
+      }, 2000);
     } else {
-      setToggleCharts("lineChart");
+      setLoading(true);
+      setTimeout(() => {
+        setLoading(false);
+        setToggleCharts("lineChart");
+      }, 2000);
     }
   };
   return (
     <div>
-    <Card
-      header={
-        <CardHeader
-          titleText="Card"
-          interactive
-          onClick={handleHeaderClick}
-          avatar={ <Icon name={ toggleCharts === "lineChart" ? "line-chart" : "horizontal-bar-chart" } /> }
-        />
-      }
-      style={{ width: "300px" }}
-    >
-        <Text style={spacing.sapUiContentPadding}>
-          This is the content area of the Card
-        </Text>
-        {toggleCharts === "lineChart" ? (
-          <LineChart
-            dimensions={[{ accessor: "month" }]}
-            measures={[{ accessor: "data", label: "Stock Price" }]}
-            dataset={dataset}
+      <ShellBar
+        logo={<img src="reactLogo.png" />}
+        profile={
+          <Avatar>
+            <img src="profilePictureExample.png" />
+          </Avatar>
+        }
+        primaryTitle="My App"
+      >
+        <ShellBarItem icon="add" text="Add" />
+      </ShellBar>
+      <FlexBox
+        justifyContent={FlexBoxJustifyContent.Center}
+        wrap={FlexBoxWrap.Wrap}
+        style={spacing.sapUiContentPadding}
+      >
+        <Card
+          header={
+            <CardHeader
+              titleText="Stock Prices"
+              subtitleText={`Click here to switch to ${switchToChart}`}
+              interactive
+              onClick={handleHeaderClick}
+              avatar={
+                <Icon
+                  name={
+                    toggleCharts === "lineChart"
+                      ? "line-chart"
+                      : "horizontal-bar-chart"
+                  }
+                />
+              }
+            />
+          }
+          style={{ width: "300px", ...spacing.sapUiContentPadding }}
+        >
+          <Text style={spacing.sapUiContentPadding}>{contentTitle}</Text>
+          {toggleCharts === "lineChart" ? (
+            <LineChart
+              dimensions={[{ accessor: "month" }]}
+              measures={[{ accessor: "data", label: "Stock Price" }]}
+              dataset={dataset}
+              loading={loading}
+            />
+          ) : (
+            <BarChart
+              dimensions={[{ accessor: "month" }]}
+              measures={[{ accessor: "data" }]}
+              dataset={dataset}
+              loading={loading}
+            />
+          )}
+        </Card>
+        <Card
+          header={
+            <CardHeader
+              titleText="Progress"
+              subtitleText="List"
+              avatar={<Icon name="list" />}
+            />
+          }
+          style={{ width: "300px", ...spacing.sapUiContentPadding }}
+        >
+          <List>
+            <StandardListItem
+              additionalText="finished"
+              additionalTextState={ValueState.Success}
+            >
+              Activity 1
+            </StandardListItem>
+            <StandardListItem
+              additionalText="failed"
+              additionalTextState={ValueState.Error}
+            >
+              Activity 2
+            </StandardListItem>
+            <StandardListItem
+              additionalText="in progress"
+              additionalTextState={ValueState.Warning}
+              style={{ height: "80px" }}
+            >
+              <FlexBox direction={FlexBoxDirection.Column}>
+                <Title level={TitleLevel.H5}>Activity 3</Title>
+                <ProgressIndicator value={89} valueState={ValueState.Success} />
+              </FlexBox>
+            </StandardListItem>
+            <StandardListItem
+              additionalText="in progress"
+              additionalTextState={ValueState.Warning}
+              style={{ height: "80px" }}
+            >
+              <FlexBox direction={FlexBoxDirection.Column}>
+                <Title level={TitleLevel.H5}>Activity 4</Title>
+                <ProgressIndicator value={5} valueState={ValueState.Error} />
+              </FlexBox>
+            </StandardListItem>
+          </List>
+        </Card>
+        <Card
+          header={
+            <CardHeader
+              titleText="AnalyticalTable"
+              avatar={<Icon name="table-view" />}
+            />
+          }
+          style={{ maxWidth: "900px", ...spacing.sapUiContentPadding }}
+        >
+          <AnalyticalTable
+            data={tableData}
+            columns={tableColumns}
+            visibleRows={5}
           />
-        ) : (
-          <BarChart
-            dimensions={[{ accessor: "month" }]}
-            measures={[{ accessor: "data", label: "Stock Price" }]}
-            dataset={dataset}
-          />
-        )}
-      </Card>
+        </Card>
+      </FlexBox>
     </div>
   );
 }
